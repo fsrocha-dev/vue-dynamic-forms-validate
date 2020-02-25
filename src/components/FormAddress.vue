@@ -61,12 +61,13 @@ export default {
   },
   methods: {
     submit() {
-      if (!this.$v.$invalid) {
-        this.$emit("update", {
+      this.$emit("update", {
+        data: {
           address: this.form.address,
           recipient: this.form.recipient
-        });
-      }
+        },
+        valid: !this.$v.$invalid
+      });
     }
   }
 };

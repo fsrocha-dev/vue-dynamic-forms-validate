@@ -79,13 +79,14 @@ export default {
   },
   methods: {
     submit() {
-      if (!this.$v.$invalid) {
-        this.$emit("update", {
+      this.$emit("update", {
+        data: {
           email: this.form.email,
           password: this.form.password,
           name: this.form.name
-        });
-      }
+        },
+        valid: !this.$v.$invalid
+      });
     }
   }
 };
