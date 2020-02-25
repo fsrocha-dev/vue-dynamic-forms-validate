@@ -1,78 +1,77 @@
 <template>
   <div>
-    <h1 class="title">Coffee Plans</h1>
+    <h1 class="title">Planos CoffeeBox</h1>
 
-    <h2 class="subtitle">
-      We travel the world to source the very best single origin coffee for you
-    </h2>
+    <h2 class="subtitle">O mais genuino café, para amantes do verdadeiro sabor</h2>
 
     <div class="plans">
       <div
         v-for="plan in plans"
         :key="plan.price"
         @click="pickPlan(plan)"
-        :class="{'active-plan': selectedPlan === plan}"
+        :class="{ 'active-plan': selectedPlan === plan }"
         class="plan"
       >
-        <div class="weight">
-          {{plan.weight}}
-        </div>
+        <div class="weight">{{ plan.weight }}</div>
         <div class="description">
-          <span class="title">
-              {{plan.name}}
-          </span>
-          <span class="description">
-              {{plan.description}}
-          </span>
+          <span class="title">{{ plan.name }}</span>
+          <span class="description">{{ plan.description }}</span>
         </div>
         <div class="price">
-          <span class="dollar-sign">$</span>
-          <span class="number">{{plan.price}}</span>
+          <span class="dollar-sign">R$</span>
+          <span class="number">{{ plan.price }}</span>
         </div>
       </div>
     </div>
-    <div v-if="$v.selectedPlan.$error" class="error">you should pick a plan to continue</div>
+    <div v-if="$v.selectedPlan.$error" class="error">escolha um plano para continuar</div>
   </div>
 </template>
 
 <script>
-  import {required} from 'vuelidate/lib/validators'
+import { required } from "vuelidate/lib/validators";
 
-  export default {
-    data() {
-      return {
-        plans: [
-          {
-            price: 19,
-            weight: '250g',
-            name: 'The Single',
-            description: 'One bag of freshly roasted coffee beans delivered to your house every month'
-          },
-          {
-            price: 29,
-            weight: '500g',
-            name: 'The Curious',
-            description: 'Two different types of freshly roasted coffee every month'
-          },
-          {
-            price: 49,
-            weight: '1kg',
-            name: 'The Addict',
-            description: 'Two bags of two different types of freshly roasted coffee every month.'
-          }
-        ],
-        selectedPlan: null
-      }
-    },
-    validations: {
-      selectedPlan: {
-        required
-      }
-    },
-    methods: {
-      pickPlan (plan) {
-        this.selectedPlan = plan
-      }
+export default {
+  data() {
+    return {
+      plans: [
+        {
+          price: 19,
+          weight: "250g",
+          name: "Básico",
+          description:
+            "Um saco de grãos de café torrados na hora entregues em sua casa todos os meses"
+        },
+        {
+          price: 29,
+          weight: "500g",
+          name: "Curioso",
+          description:
+            "Dois tipos diferentes de café recém-torrado todos os meses"
+        },
+        {
+          price: 49,
+          weight: "1kg",
+          name: "Viciado",
+          description:
+            "Dois sacos de dois tipos diferentes de café recém-torrado todos os meses."
+        }
+      ],
+      selectedPlan: null
+    };
+  },
+  validations: {
+    selectedPlan: {
+      required
+    }
+  },
+  methods: {
+    pickPlan(plan) {
+      this.selectedPlan = plan;
+
+      this.$emit("update", {
+        plan: this.selectedPlan
+      });
     }
   }
+};
 </script>

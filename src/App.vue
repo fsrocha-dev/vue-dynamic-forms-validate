@@ -2,23 +2,23 @@
   <div id="app" class="container mx-auto py-6">
     <header>
       <div>
-        <span id="logo">Liquid Gold Box</span>
+        <span id="logo">Café da Serra</span>
       </div>
     </header>
 
     <div class="content">
-      <FormWizard/>
+      <FormWizard />
     </div>
   </div>
 </template>
 
 <script>
-import FormWizard from './components/FormWizard.vue'
+import FormWizard from "./components/FormWizard.vue";
 
 export default {
-  name: 'app',
+  name: "app",
   components: {
     FormWizard
   }
-}
+};
 </script>

@@ -10,7 +10,7 @@ export const checkIfUserExistsInDB = email => {
       if (email === user.email) {
         resolve(true);
       } else {
-        reject("user not found");
+        reject("usuário não encontrado");
       }
     }, 1000);
   });
@@ -26,7 +26,7 @@ export const authenticateUser = (email, password) => {
           name: user.name
         });
       } else {
-        reject("supplied credentials do not match any user");
+        reject("Essas credenciais não pertencem a nenhum usuário");
       }
     }, 1000);
   });
