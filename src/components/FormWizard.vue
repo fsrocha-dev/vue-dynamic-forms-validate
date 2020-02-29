@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="wizardInProgress">
+    <div v-if="wizardInProgress" v-show="asyncState !== 'pending'">
       <keep-alive>
         <component ref="currentStep" :is="currentStep" @update="processStep" :wizard-data="form"></component>
       </keep-alive>
@@ -26,6 +26,12 @@
         <a href="#" target="_blank" class="btn">Vá a algum lugar legal</a>
       </p>
     </div>
+    <div class="loading-wrapper" v-if="asyncState === 'pending'">
+      <div class="loader">
+        <img src="/spinner.svg" alt />
+        <p>Porfavor aguarde...</p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -47,6 +53,7 @@ export default {
     return {
       currentStepNumber: 1,
       canGoNext: false,
+      asyncState: null,
       steps: [
         "FormPlanPicker",
         "FormUserDetails",
@@ -84,9 +91,11 @@ export default {
   },
   methods: {
     submitOrder() {
+      this.asyncState = "pending";
       postFormToDB(this.form).then(() => {
         console.log("ok");
         this.currentStepNumber++;
+        this.asyncState = "success";
       });
     },
     nextButtonAction() {

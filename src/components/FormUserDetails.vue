@@ -9,6 +9,7 @@
         <label class="form-label" for="email">Email</label>
         <input
           type="text"
+          @input="checkIfUserExists"
           v-model="$v.form.email.$model"
           placeholder="seu@email.com"
           class="form-control"
@@ -21,7 +22,7 @@
         <div v-if="$v.form.email.$error && !$v.form.email.email" class="error">O email é inválido</div>
       </div>
 
-      <div class="form-group">
+      <div v-if="emailCheckedInDB" class="form-group">
         <label class="form-label" for="password">Senha</label>
         <input
           v-model="$v.form.password.$model"
@@ -34,9 +35,17 @@
           v-if="$v.form.password.$error && !$v.form.password.required"
           class="error"
         >A senha é obrigatório</div>
+        <div
+          v-if="$v.form.password.$error && !$v.form.password.correct"
+          class="error"
+        >Senha inválida tente novamente</div>
       </div>
 
-      <div class="form-group">
+      <div v-if="existingUser" class="form-group">
+        <button @click.prevent="login" class="btn">Logar</button>
+      </div>
+
+      <div v-if="emailCheckedInDB && !existingUser" class="form-group">
         <label class="form-label" for="name">Nome</label>
         <input
           v-model="$v.form.name.$model"
@@ -52,7 +61,9 @@
 </template>
 
 <script>
+import { authenticateUser, checkIfUserExistsInDB } from "../api";
 import { required, email } from "vuelidate/lib/validators";
+
 export default {
   data() {
     return {
@@ -60,7 +71,10 @@ export default {
         email: null,
         password: null,
         name: null
-      }
+      },
+      emailCheckedInDB: false,
+      existingUser: false,
+      wrongPassword: false
     };
   },
   validations: {
@@ -70,7 +84,10 @@ export default {
         email
       },
       password: {
-        required
+        required,
+        correct() {
+          return !this.wrongPassword;
+        }
       },
       name: {
         required
@@ -78,6 +95,35 @@ export default {
     }
   },
   methods: {
+    checkIfUserExists() {
+      if (!this.$v.form.email.$invalid) {
+        return checkIfUserExistsInDB(this.form.email)
+          .then(() => {
+            // Usuário existe
+            this.existingUser = true;
+            this.emailCheckedInDB = true;
+          })
+          .catch(() => {
+            this.existingUser = false;
+            this.emailCheckedInDB = true;
+          });
+      }
+    },
+
+    login() {
+      this.wrongPassword = false;
+      if (!this.$v.form.password.$invalid) {
+        return authenticateUser(this.form.email, this.form.password)
+          .then(user => {
+            this.form.name = user.name;
+            this.submit();
+          })
+          .catch(() => {
+            this.wrongPassword = true;
+          });
+      }
+    },
+
     submit() {
       this.$emit("update", {
         data: {
