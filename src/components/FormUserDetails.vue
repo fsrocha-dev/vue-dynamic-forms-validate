@@ -4,12 +4,12 @@
 
     <h2 class="subtitle">Crie uma conta ou faça login para solicitar sua assinatura de CoffeeBox</h2>
 
-    <form class="form" @input="submit">
+    <form v-if="!loggedIn" class="form" @input="submit">
       <div class="form-group">
         <label class="form-label" for="email">Email</label>
         <input
           type="text"
-          @input="checkIfUserExists"
+          @blur="checkIfUserExists"
           v-model="$v.form.email.$model"
           placeholder="seu@email.com"
           class="form-control"
@@ -57,6 +57,10 @@
         <div v-if="$v.form.name.$error" class="error">O nome é obrigatório</div>
       </div>
     </form>
+    <div v-else class="text-center">
+      Logado com sucesso!
+      <a href="#" @click="reset">Não é {{form.name}}?</a>
+    </div>
   </div>
 </template>
 
@@ -76,6 +80,11 @@ export default {
       existingUser: false,
       wrongPassword: false
     };
+  },
+  computed: {
+    loggedIn() {
+      return this.existingUser && this.form.name;
+    }
   },
   validations: {
     form: {
@@ -97,15 +106,18 @@ export default {
   methods: {
     checkIfUserExists() {
       if (!this.$v.form.email.$invalid) {
+        this.$emit("updateAsyncState", "pending");
         return checkIfUserExistsInDB(this.form.email)
           .then(() => {
             // Usuário existe
             this.existingUser = true;
             this.emailCheckedInDB = true;
+            this.$emit("updateAsyncState", "success");
           })
           .catch(() => {
             this.existingUser = false;
             this.emailCheckedInDB = true;
+            this.$emit("updateAsyncState", "success");
           });
       }
     },
@@ -113,15 +125,28 @@ export default {
     login() {
       this.wrongPassword = false;
       if (!this.$v.form.password.$invalid) {
+        this.$emit("updateAsyncState", "pending");
         return authenticateUser(this.form.email, this.form.password)
           .then(user => {
             this.form.name = user.name;
             this.submit();
+            this.$emit("updateAsyncState", "success");
           })
           .catch(() => {
             this.wrongPassword = true;
+            this.$emit("updateAsyncState", "success");
           });
       }
+    },
+
+    reset() {
+      this.form.email = null;
+      this.form.password = null;
+      this.form.name = null;
+      this.emailCheckedInDB = false;
+      this.wrongPassword = false;
+      this.existingUser = false;
+      this.$v.$reset();
     },
 
     submit() {
