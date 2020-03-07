@@ -29,7 +29,7 @@
 
       <p class="description">Mime-se nivelando sua caixa mensal</p>
 
-      <div @change="submit" class="options">
+      <div class="options">
         <div class="option">
           <input v-model="form.chocolate" type="checkbox" value="chocolate" id="chocolate" />
           <label for="chocolate">4 pcs. Chocolate de Origem Única (+R$4,00/mês)</label>
@@ -87,12 +87,9 @@ export default {
   validations: {},
   methods: {
     submit() {
-      this.$emit("update", {
-        data: {
-          chocolate: this.form.chocolate,
-          otherTreat: this.form.otherTreat
-        },
-        valid: true
+      return Promise.resolve({
+        chocolate: this.form.chocolate,
+        otherTreat: this.form.otherTreat
       });
     }
   }

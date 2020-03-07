@@ -4,7 +4,7 @@
 
     <h2 class="subtitle">Para onde devemos enviar seus grãos de café recém-torrados?</h2>
 
-    <form class="form" @input="submit">
+    <form class="form">
       <div class="form-group">
         <label class="form-label" for="delivery_name">Nome</label>
         <input
@@ -64,12 +64,16 @@ export default {
   },
   methods: {
     submit() {
-      this.$emit("update", {
-        data: {
-          address: this.form.address,
-          recipient: this.form.recipient
-        },
-        valid: !this.$v.$invalid
+      this.$v.$touch();
+      return new Promise((resolve, reject) => {
+        if (!this.$v.$invalid) {
+          resolve({
+            address: this.form.address,
+            recipient: this.form.recipient
+          });
+        } else {
+          reject("invalid address");
+        }
       });
     }
   }
